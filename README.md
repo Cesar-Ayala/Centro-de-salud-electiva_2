@@ -46,7 +46,7 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-## Code of Conduct
+## Code of Conduct/(/)
 
 In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
@@ -64,7 +64,7 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 ### Sistema de diseño
 
-Todos los estilos propios viven en `resources/views/partials/theme.blade.php`, que se
+Todos los estilos propios viven en `resources/views/partials/theme.blade.php`. Que se
 incluye desde el layout, el login y la página institucional. Funciona igual si los
 assets se compilan con `npm run build` o si Tailwind se carga desde CDN, porque el
 diseño se apoya en variables CSS y clases propias (`.card`, `.btn`, `.table`,
