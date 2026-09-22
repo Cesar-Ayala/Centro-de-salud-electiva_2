@@ -1,0 +1,406 @@
+# Laravel — Reglas de Convenciones y Estándares de Código
+
+**Proyecto:** Laravel + Vue 3 + Node.js  
+**Autor:** Darwin Montes  
+**Versión:** 1.0.0
+
+---
+
+## 🧠 Principio Fundamental
+
+Este proyecto sigue estrictamente el principio **"Convención sobre Configuración"** (_Convention over Configuration_) de Laravel. Respetar estas reglas permite que Eloquent, las migraciones y los controladores se enlacen automáticamente sin configuración adicional. **Ninguna excepción debe realizarse sin documentar el motivo en un comentario PHPDoc.**
+
+---
+
+## 🌐 Idioma
+
+- **Toda respuesta, sugerencia, comentario o explicación generada debe estar en español.**
+- **Todo el código debe estar comentado en español**, siguiendo el Estándar PHPDoc.
+- Los comentarios deben ser **explicativos a nivel profesional**: no describir _qué_ hace una línea, sino _por qué_ existe y _qué problema resuelve_.
+- Los nombres de tablas, modelos, columnas y clases se escriben en **inglés** (convención del framework), pero sus comentarios PHPDoc siempre en **español**.
+
+---
+
+## 📝 Estándar de Comentarios PHPDoc (en Español)
+
+### Formato obligatorio para clases
+
+```php
+/**
+ * Modelo que representa un curso dentro del sistema académico.
+ *
+ * Gestiona la relación entre los cursos y sus categorías, así como
+ * la lógica de negocio asociada al ciclo de vida de un curso.
+ *
+ * @package App\Models
+ * @author  Darwin Montes
+ */
+class Course extends Model
+```
+
+### Formato obligatorio para métodos
+
+```php
+/**
+ * Recupera todos los cursos activos junto con su categoría asociada.
+ *
+ * Se utiliza eager loading (with) para evitar el problema N+1 de consultas,
+ * garantizando que la relación 'category' se cargue en una sola consulta
+ * adicional en lugar de una por cada curso.
+ *
+ * @return \Illuminate\Http\JsonResponse Lista paginada de cursos con su categoría.
+ */
+public function index(): JsonResponse
+```
+
+### Formato obligatorio para propiedades
+
+```php
+/**
+ * Campos que pueden asignarse de forma masiva mediante Mass Assignment.
+ *
+ * Se declaran explícitamente para proteger el modelo contra ataques
+ * de asignación masiva (Mass Assignment Attack). Solo se listan los campos
+ * que el usuario tiene permitido modificar directamente.
+ *
+ * @var array<string>
+ */
+protected $fillable = ['title', 'description', 'category_id', 'is_active'];
+```
+
+### Reglas de calidad para comentarios
+
+- ✅ Explicar el **propósito** y el **contexto de negocio**
+- ✅ Mencionar **patrones** usados (eager loading, Repository, etc.) y por qué
+- ✅ Advertir sobre **efectos secundarios** o restricciones importantes
+- ✅ Documentar **@param**, **@return**, **@throws** en todos los métodos públicos
+- ❌ No escribir comentarios obvios como `// obtiene el curso` sobre `getCourse()`
+- ❌ No dejar métodos públicos sin bloque PHPDoc
+
+---
+
+## 🗄️ 1. Tablas y Bases de Datos
+
+| Regla   | Valor        |
+| ------- | ------------ |
+| Idioma  | Inglés       |
+| Formato | `snake_case` |
+| Número  | Plural       |
+
+```
+✅ users
+✅ products
+✅ course_categories
+✅ order_items
+❌ Cursos
+❌ courseCategory
+❌ User
+```
+
+### Tablas Pivot (Relaciones N:M)
+
+- Nombres de los **dos modelos en singular**, en **estricto orden alfabético**, separados por `_`.
+- Nunca pluralizar ninguno de los dos segmentos.
+
+```
+✅ role_user          (role precede a user)
+✅ category_product   (category precede a product)
+✅ course_user        (course precede a user)
+❌ user_role
+❌ users_roles
+❌ roles_users
+```
+
+---
+
+## 🔑 2. Claves Primarias y Foráneas
+
+### Clave Primaria (PK)
+
+```php
+$table->id(); // Siempre 'id' — entero autoincremental sin excepción
+```
+
+### Clave Foránea (FK)
+
+- Formato: **nombre del modelo referenciado en singular** + `_id`
+
+```
+✅ user_id        → referencia a tabla users
+✅ product_id     → referencia a tabla products
+✅ category_id    → referencia a tabla categories
+❌ users_id
+❌ id_user
+❌ fk_user
+```
+
+---
+
+## 🏛️ 3. Modelos Eloquent (`app/Models`)
+
+| Regla   | Valor        |
+| ------- | ------------ |
+| Idioma  | Inglés       |
+| Formato | `PascalCase` |
+| Número  | Singular     |
+
+Laravel mapea automáticamente `NombreModelo` (singular) → `nombre_modelos` (plural, snake_case) en la base de datos.
+
+```
+✅ User              → tabla: users
+✅ Product           → tabla: products
+✅ CourseCategory    → tabla: course_categories
+✅ OrderItem         → tabla: order_items
+❌ Users
+❌ course_category
+❌ Curso
+```
+
+---
+
+## 📦 4. Migraciones (`database/migrations`)
+
+El nombre lo genera automáticamente `php artisan`. **Nunca renombrar manualmente** un archivo de migración después de ejecutarlo.
+
+### Crear tabla
+
+```
+create_[nombre_tabla_plural]_table
+
+✅ 2026_09_04_000000_create_products_table.php
+✅ 2026_09_04_000001_create_course_categories_table.php
+```
+
+### Modificar tabla
+
+```
+add_[campo]_to_[nombre_tabla_plural]_table
+
+✅ 2026_09_04_000002_add_status_to_users_table.php
+✅ 2026_09_04_000003_add_thumbnail_to_courses_table.php
+```
+
+---
+
+## 🎮 5. Controladores (`app/Http/Controllers`)
+
+| Regla   | Valor                      |
+| ------- | -------------------------- |
+| Idioma  | Inglés                     |
+| Formato | `PascalCase`               |
+| Número  | Singular                   |
+| Sufijo  | `Controller` (obligatorio) |
+
+```
+✅ UserController
+✅ ProductController
+✅ CourseCategoryController
+❌ UsersController
+❌ CourseCategories
+❌ course_category_controller
+```
+
+---
+
+## 🛤️ 6. Rutas Web y API
+
+| Regla   | Valor        |
+| ------- | ------------ |
+| Formato | `kebab-case` |
+| Número  | Plural       |
+
+```
+✅ /users
+✅ /course-categories
+✅ /order-items
+✅ /api/course-categories/{id}
+❌ /CourseCategories
+❌ /course_categories
+❌ /getCourseCategories
+```
+
+---
+
+## 🌱 7. Seeders — Estructura Obligatoria (`database/seeders`)
+
+Todo seeder del proyecto **debe seguir obligatoriamente** la estructura de transacción + manejo de excepciones que se documenta a continuación. No existe excepción a esta regla.
+
+### ¿Por qué es obligatorio?
+
+- **Transacciones (`DB::beginTransaction`)**: garantizan que si cualquier inserción falla a mitad del proceso, la base de datos quede en su estado original. Sin esto, un seeder parcialmente ejecutado puede dejar datos inconsistentes imposibles de detectar a simple vista.
+- **`Schema::disableForeignKeyConstraints()`**: necesario antes de `truncate()` para evitar errores de integridad referencial cuando existen relaciones entre tablas.
+- **`\Throwable` en lugar de `\Exception`**: captura tanto errores de PHP (`Error`) como excepciones (`Exception`), cubriendo casos como errores fatales, de tipo o de memoria que `\Exception` no intercepta.
+- **`throw $th` en el catch**: relanza la excepción para que Laravel la muestre en consola. Sin esto, los errores se silencian y el desarrollador no sabe qué falló.
+- **`finally`**: garantiza que las FK se reactiven **siempre**, incluso si ocurre un error, evitando que la BD quede en estado inseguro.
+- **Inserción masiva con `DB::table()->insert($array)`**: realiza una única consulta SQL en lugar de N consultas individuales. Es significativamente más eficiente en seeders con muchos registros.
+
+### Estructura canónica obligatoria
+
+```php
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\NombreModelo;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+/**
+ * Seeder para poblar la tabla [nombre_tabla] con datos iniciales del sistema.
+ *
+ * Utiliza transacciones de base de datos para garantizar la integridad
+ * de los datos: si cualquier operación falla, todos los cambios se revierten
+ * automáticamente dejando la base de datos en su estado previo.
+ *
+ * @package Database\Seeders
+ * @author  Darwin Montes
+ */
+class NombreModeloSeeder extends Seeder
+{
+    /**
+     * Pobla la tabla [nombre_tabla] con los registros iniciales requeridos.
+     *
+     * El proceso sigue este orden para garantizar la integridad referencial:
+     * 1. Deshabilitar FK para permitir el truncado sin errores de restricción.
+     * 2. Iniciar transacción para asegurar atomicidad de todas las inserciones.
+     * 3. Limpiar la tabla e insertar en bloque (una sola consulta SQL).
+     * 4. Confirmar o revertir según el resultado, y restaurar FK siempre.
+     *
+     * @return void
+     * @throws \Throwable Si ocurre cualquier error durante la inserción, se relanza
+     *                    para que sea visible en la consola de Artisan.
+     */
+    public function run(): void
+    {
+        try {
+            // Paso 1: Deshabilitar restricciones de FK para permitir truncate()
+            // sin que Laravel lance errores de integridad referencial.
+            Schema::disableForeignKeyConstraints();
+
+            // Paso 2: Iniciar transacción — cualquier fallo posterior
+            // revertirá TODOS los cambios realizados dentro de este bloque.
+            DB::beginTransaction();
+
+            // Paso 3: Limpiar la tabla antes de insertar para evitar
+            // duplicados al ejecutar el seeder más de una vez.
+            NombreModelo::truncate();
+
+            // Paso 4: Capturar el timestamp una sola vez para que todos los
+            // registros tengan exactamente la misma marca de tiempo,
+            // evitando microsegundos de diferencia entre registros.
+            $now = now();
+
+            $datos = [
+                ['id' => 1, 'nombre' => 'Ejemplo', 'created_at' => $now, 'updated_at' => $now],
+                // ... más registros
+            ];
+
+            // Paso 5: Inserción masiva en una sola consulta SQL.
+            // Mucho más eficiente que un foreach con ::create() o ->save(),
+            // especialmente con grandes volúmenes de datos.
+            DB::table('nombre_tabla')->insert($datos);
+
+            // Paso 6: Confirmar la transacción — los datos se persisten
+            // en la base de datos solo si llegamos hasta aquí sin errores.
+            DB::commit();
+
+        } catch (\Throwable $th) {
+            // Revertir todos los cambios de esta transacción para mantener
+            // la base de datos en su estado original antes del seeder.
+            DB::rollBack();
+
+            // Relanzar la excepción para que sea visible en la consola
+            // de Artisan. Sin esto, el error se silencia y el desarrollador
+            // no puede saber qué salió mal ni en qué línea ocurrió.
+            throw $th;
+
+        } finally {
+            // Reactivar FK siempre — se ejecuta tanto si hubo éxito como
+            // si hubo error. Sin esto, la BD podría quedar en estado inseguro
+            // con las restricciones deshabilitadas permanentemente.
+            Schema::enableForeignKeyConstraints();
+        }
+    }
+}
+```
+
+### Reglas específicas de Seeders
+
+| Regla                                                             | Obligatorio                           |
+| ----------------------------------------------------------------- | ------------------------------------- |
+| Usar `DB::beginTransaction()` + `DB::commit()` + `DB::rollBack()` | ✅ Siempre                            |
+| Capturar con `\Throwable` (no `\Exception`)                       | ✅ Siempre                            |
+| Relanzar con `throw $th` en el `catch`                            | ✅ Siempre                            |
+| Reactivar FK en bloque `finally`                                  | ✅ Siempre                            |
+| Inserción masiva con `DB::table()->insert($array)`                | ✅ Siempre que sean más de 1 registro |
+| Capturar `$now = now()` una sola vez fuera del array              | ✅ Siempre                            |
+| Bloque PHPDoc completo en clase y método `run()`                  | ✅ Siempre                            |
+
+### Cuándo usar transacciones fuera de Seeders
+
+El mismo patrón `beginTransaction / commit / rollBack` es **obligatorio** en cualquier operación que modifique múltiples registros o tablas de forma relacionada:
+
+- Controladores con operaciones de escritura encadenadas (crear orden + actualizar stock + registrar movimiento)
+- Jobs y Commands que procesen lotes de datos
+- Services que orquesten múltiples modelos en una sola operación de negocio
+
+---
+
+## ⚡ 8. Comandos Artisan — Generación Automatizada
+
+Usar siempre el generador de Artisan para garantizar que las convenciones se apliquen correctamente desde el inicio.
+
+```bash
+# Genera Modelo + Migración + Factory + Seeder + Controlador Resource en un solo comando
+php artisan make:model NombreModelo -mfsr
+
+# Flags disponibles:
+# -m  → Migración (create_nombre_modelos_table)
+# -f  → Factory   (NombreModeloFactory)
+# -s  → Seeder    (NombreModeloSeeder)
+# -r  → Controlador Resource con los 7 métodos estándar (NombreModeloController)
+```
+
+---
+
+## 📐 9. Matriz Resumen
+
+| Elemento            | Estilo       | Regla Gramatical            | Ejemplo                    |
+| ------------------- | ------------ | --------------------------- | -------------------------- |
+| Tabla de BD         | `snake_case` | Plural · Inglés             | `course_categories`        |
+| Tabla Pivot N:M     | `snake_case` | Singular · Orden alfabético | `course_user`              |
+| Modelo Eloquent     | `PascalCase` | Singular · Inglés           | `CourseCategory`           |
+| Clave Primaria (PK) | —            | Siempre `id`                | `id`                       |
+| Clave Foránea (FK)  | `snake_case` | Singular + `_id`            | `course_category_id`       |
+| Migración           | `snake_case` | Acción descriptiva          | `create_courses_table`     |
+| Controlador         | `PascalCase` | Singular + `Controller`     | `CourseCategoryController` |
+| Ruta Web / API      | `kebab-case` | Plural                      | `/course-categories`       |
+
+---
+
+## ✅ 10. Checklist antes de hacer commit
+
+**Nomenclatura**
+
+- [ ] El nombre de la tabla es plural, snake_case, en inglés
+- [ ] El modelo es singular, PascalCase, en inglés
+- [ ] Todas las FK terminan en `_id`
+- [ ] El controlador termina en `Controller`
+- [ ] Las rutas son kebab-case y plurales
+
+**Documentación**
+
+- [ ] Cada clase tiene su bloque PHPDoc en español
+- [ ] Cada método público tiene `@param`, `@return` y `@throws` en español
+- [ ] Los comentarios explican el **porqué**, no solo el **qué**
+
+**Seeders y Transacciones**
+
+- [ ] El seeder usa `disableForeignKeyConstraints()` antes del truncate
+- [ ] El seeder usa `DB::beginTransaction()` / `DB::commit()` / `DB::rollBack()`
+- [ ] El catch captura `\Throwable` y relanza con `throw $th`
+- [ ] El `finally` reactiva las FK con `enableForeignKeyConstraints()`
+- [ ] La inserción usa `DB::table()->insert($array)` en bloque, no foreach
+- [ ] El timestamp `$now = now()` se captura una sola vez fuera del array
+- [ ] Cualquier operación multi-tabla en controladores/services también usa transacción
